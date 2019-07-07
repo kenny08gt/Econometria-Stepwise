@@ -1,0 +1,125 @@
+---
+title: "Laboratorio 6"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(caret)
+library(leaps)
+library(MASS)
+```
+
+## Foward stepwise
+```{r eval=FALSE}
+# Fit the full model 
+full.model <- lm(Fertility ~., data = swiss)
+# Stepwise regression model
+step.model <- stepAIC(full.model, direction = "forward", 
+                      trace = FALSE)
+```
+
+```{r echo=TRUE}
+summary(step.model)
+```
+
+```{r eval=FALSE}
+models <- regsubsets(Fertility~., data = swiss, nvmax = 5,
+                     method = "forward")
+```
+
+```{r echo=TRUE}
+summary(models)
+```
+```{r eval=FALSE}
+# Set seed for reproducibility
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(Fertility ~., data = swiss,
+                    method = "leapSeq", 
+                    tuneGrid = data.frame(nvmax = 1:5),
+                    trControl = train.control
+)
+```
+
+ * **nvmax**: Numero de variables en el modelo
+ * **rmse y mae**: mientras mas pequeños mejor
+```{r echo=TRUE}
+step.model$results
+
+#nvmax: the number of variable in the model. For example nvmax = 2, specify the best 2-variables model
+#RMSE and MAE are two different metrics measuring the prediction error of each model. The lower the RMSE and MAE, the better the model.
+#Rsquared indicates the correlation between the observed outcome values and the values predicted by the model. The higher the R squared, the better the model.
+```
+
+
+El mejor modelo
+```{r echo=TRUE}
+step.model$bestTune
+```
+
+```{r echo=TRUE}
+summary(step.model$finalModel)
+```
+```{r echo=TRUE}
+coef(step.model$finalModel, 5)
+```
+
+## Backward stepwise
+```{r eval=FALSE}
+# Fit the full model 
+full.model <- lm(Fertility ~., data = swiss)
+# Stepwise regression model
+step.model <- stepAIC(full.model, direction = "backward", 
+                      trace = FALSE)
+```
+
+```{r echo=TRUE}
+summary(step.model)
+```
+
+```{r eval=FALSE}
+models <- regsubsets(Fertility~., data = swiss, nvmax = 5,
+                     method = "backward")
+```
+
+```{r echo=TRUE}
+summary(models)
+```
+```{r eval=FALSE}
+# Set seed for reproducibility
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(Fertility ~., data = swiss,
+                    method = "leapSeq", 
+                    tuneGrid = data.frame(nvmax = 1:5),
+                    trControl = train.control
+)
+```
+
+ * **nvmax**: Numero de variables en el modelo
+ * **rmse y mae**: mientras mas pequeños mejor
+```{r echo=TRUE}
+step.model$results
+
+#nvmax: the number of variable in the model. For example nvmax = 2, specify the best 2-variables model
+#RMSE and MAE are two different metrics measuring the prediction error of each model. The lower the RMSE and MAE, the better the model.
+#Rsquared indicates the correlation between the observed outcome values and the values predicted by the model. The higher the R squared, the better the model.
+```
+
+
+El mejor modelo
+```{r echo=TRUE}
+step.model$bestTune
+```
+
+```{r echo=TRUE}
+summary(step.model$finalModel)
+```
+```{r echo=TRUE}
+coef(step.model$finalModel, 5)
+```
+
